@@ -1,5 +1,8 @@
 #include <bits/stdc++.h>
 
+// with all questions and suggestions write to the e-mail:
+// ypodlesov@gmail.com
+
 using namespace std;
 
 void max_heapify(vector<int> &a, int i);

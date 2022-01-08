@@ -1,5 +1,8 @@
 #include <bits/stdc++.h>
 
+// with all questions and suggestions write to the e-mail:
+// ypodlesov@gmail.com
+
 using namespace std;
 
 void merge(vector<int> &a, int left, int right, int mid);
