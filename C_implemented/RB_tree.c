@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "leak.c"
 
 // with all questions and suggestions write to the e-mail:
 // ypodlesov@gmail.com
