@@ -21,9 +21,7 @@ tree* RB_insert(tree* root, int key, int data);
 tree* insert_fixup(tree* root, tree* z);
 tree* get_min_node(tree* root);
 tree* get_max_node(tree* root);
-tree* RB_delete(tree* root, tree* target);
-int define_case(tree* y, tree* x, char side_of_x);
-tree* delete_fixup(tree* root, tree* y, tree* x);
+tree* RB_delete(tree* root, tree* z);
 
 
 int main(void) {
@@ -47,6 +45,8 @@ int main(void) {
         else if (ch == 'D') {
             int key;
             fscanf(in, "%d", &key);
+            if (key == 30)
+                key = 30;
             root = RB_delete(root, search(root, key));
         }
         else if (ch == 'S') {
@@ -137,7 +137,6 @@ tree* RB_insert(tree* root, int key, int data) {
     while (x) {
         y = x;
         if (key < x->key) x = x->left;
-        // else x = x->right;
         else if (key > x->key) x = x->right;
         else {
             x->data = data;
@@ -224,273 +223,11 @@ tree* get_max_node(tree* root) {
     return get_max_node(root->right);
 }
 
-tree* RB_delete(tree* root, tree* target) {
-    if (!target) return root;
-    if (target->color == 'R') {
-        if (target->left && target->right) {
-            // case 1
-            tree* x = get_max_node(target->left);
-            swap(&x->key, &target->key);
-            swap(&x->data, &target->data);
-            root = RB_delete(root, x);
-        }
-        else {
-            // case 2 is imposible
-            // so case 3
-            if (root == target) {
-                free(root);
-                return NULL;
-            }
-            else {
-                if (target->parent->left == target) target->parent->left = NULL;
-                else target->parent->right = NULL;
-                free(target);
-            }
-        }
-    }
-    else {
-        if (target->left && target->right) {
-            // case 4
-            tree* x = get_max_node(target->left);
-            swap(&x->key, &target->key);
-            swap(&x->data, &target->data);
-            root = RB_delete(root, x);
-        }
-        else if (target->left) {
-            //  case 5
-            tree* x = target->left;
-            swap(&x->key, &target->key);
-            swap(&x->data, &target->data);
-            root = RB_delete(root, x);
-        }
-        else if (target->right) {
-            // still case 5
-            tree* x = target->right;
-            swap(&x->key, &target->key);
-            swap(&x->data, &target->data);
-            root = RB_delete(root, x);
-        }
-        else {
-            // case 6
-            if (target == root) {
-                free(root);
-                return NULL;
-            }
-            else {
-                tree* x = target->parent;
-                if (x->left == target) x->left = NULL;
-                else x->right = NULL;
-                free(target);
-                root = delete_fixup(root, x, NULL);
-            }
-        }
-    }
-    return root;
+tree* RB_delete(tree* root, tree* z) {
+    if (!z) return root;
+    
+
 }
-
-int define_case(tree* y, tree* x, char side_of_x) {
-    if (!y) return 0;
-    if (side_of_x == 'l') {
-        tree* z = y->right;
-        if (y->color == 'R') {
-            if (!z->left && !z->right) return 1;
-            if (!z->left && z->right->color == 'B') return 1;
-            if (z->left->color == 'B' && !z->right) return 1;
-            if (z->left->color == 'B' && z->right->color == 'B') return 1;
-            if (z->right->color == 'R') return 2;
-        }
-        else {
-            tree* zl = z->left;
-            if (z->color == 'R') {
-                if (!zl->left && !zl->right) return 3;
-                if (!zl->left && zl->right->color == 'B') return 3;
-                if (zl->left->color == 'B' && !zl->right) return 3;
-                if (zl->left->color == 'B' && zl->right->color == 'B') return 3;
-                if (zl->left->color == 'R') return 4;
-            }
-            else {
-                if (zl && zl->color == 'R') return 5;
-                if (!z->left && !z->right) return 6;
-                if (!z->left && z->right->color == 'B') return 6;
-                if (z->left->color == 'B' && !z->right) return 6;
-                if (z->left->color == 'B' && z->right->color == 'B') return 6;
-            }
-        }
-    }
-    else {
-        tree* z = y->left;
-        if (y->color == 'R') {
-            if (!z->left && !z->right) return 1;
-            if (!z->left && z->right->color == 'B') return 1;
-            if (z->left->color == 'B' && !z->right) return 1;
-            if (z->left->color == 'B' && z->right->color == 'B') return 1;
-            if (z->left->color == 'R') return 2;
-        }
-        else {
-            tree* zr = z->right;
-            if (z->color == 'R') {
-                if (!zr->left && !zr->right) return 3;
-                if (!zr->left && zr->right->color == 'B') return 3;
-                if (zr->left->color == 'B' && !zr->right) return 3;
-                if (zr->left->color == 'B' && zr->right->color == 'B') return 3;
-                if (zr->right->color == 'R') return 4;
-            }
-            else {
-                if (zr && zr->color == 'R') return 5;
-                if (!z->left && !z->right) return 6;
-                if (!z->left && z->right->color == 'B') return 6;
-                if (z->left->color == 'B' && !z->right) return 6;
-                if (z->left->color == 'B' && z->right->color == 'B') return 6;
-            }
-        }
-    }
-    return 0;
-}
-
-tree* delete_fixup(tree* root, tree* y, tree* x) {
-    if (!y) return root;
-    if (x && x->color == 'R') return root;
-    if (y->left == x) {
-        int var = define_case(y, x, 'l');
-        if (var == 1) {
-            y->color = 'B';
-            y->right->color = 'R';
-        }
-        else if (var == 2) {
-            if (y == root) {
-                root = left_rotate(root);
-                if (root->left)
-                    root->left->color = 'B';
-                if (root->right)
-                    root->right->color = 'B';
-                root->color = 'B';
-            }
-            else {
-                y = left_rotate(y);
-                if (y->right)
-                    y->right->color = 'B';
-                if (y->left)
-                    y->left->color = 'B';
-                y->color = 'R';
-            }
-        }
-        else if (var == 3) {
-            if (y == root) {
-                root = left_rotate(root);
-                root->left->right->color = 'R';
-            }
-            else {
-                y = left_rotate(y);
-                y->color = 'B';
-                y->left->right->color = 'R';
-            }
-        }
-        else if (var == 4) {
-            tree* z = y->right;
-            z = right_rotate(z);
-            if (y == root) {
-                root = left_rotate(root);
-                if(root->right->left)
-                    root->right->left->color = 'B';
-            }
-            else {
-                y = left_rotate(y);
-                if (y->right->left)
-                    y->right->left->color = 'B';
-            }
-        }
-        else if (var == 5) {
-            tree* z = y->right;
-            z = right_rotate(z);
-            if (y == root) {
-                root = left_rotate(root);
-            }
-            else {
-                y = left_rotate(y);
-                y->color = 'B';
-            }
-        }
-        else if (var == 6) {
-            y->right->color = 'R';
-            root = delete_fixup(root, y->parent, y);
-        }
-        else {
-            printf("UNDEFINED CASE\n");
-        }
-    }
-    else {
-        int var = define_case(y, x, 'r');
-        if (var == 1) {
-            y->color = 'B';
-            y->left->color = 'R';
-        }
-        else if (var == 2) {
-            if (y == root) {
-                root = right_rotate(root);
-                if (root->right)
-                    root->right->color = 'B';
-                if (root->left)
-                    root->left->color = 'B';
-                root->color = 'B';
-            }
-            else {
-                y = right_rotate(y);
-                if (y->left)
-                    y->left->color = 'B';
-                if (y->right)
-                    y->right->color = 'B';
-                y->color = 'R';
-            }
-        }
-        else if (var == 3) {
-            if (y == root) {
-                root = right_rotate(root);
-                root->right->left->color = 'R';
-            }
-            else {
-                y = right_rotate(y);
-                y->color = 'B';
-                y->right->left->color = 'R';
-            }
-        }
-        else if (var == 4) {
-            tree* z = y->left;
-            z = left_rotate(z);
-            if (y == root) {
-                root = right_rotate(root);
-                if(root->left->right)
-                    root->left->right->color = 'B';
-            }
-            else {
-                y = right_rotate(y);
-                if (y->left->right)
-                    y->left->right->color = 'B';
-            }
-        }
-        else if (var == 5) {
-            tree* z = y->left;
-            z = left_rotate(z);
-            if (y == root) {
-                root = right_rotate(root);
-            }
-            else {
-                y = right_rotate(y);
-                y->color = 'B';
-            }
-        }
-        else if (var == 6) {
-            y->left->color = 'R';
-            root = delete_fixup(root, y->parent, y);
-        }
-        else {
-            printf("UNDEFINED CASE\n");
-        }
-    }
-    root->color = 'B';
-    return root;
-}
-
-
 
 // A 20 20
 // A 30 30
